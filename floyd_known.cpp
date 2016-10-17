@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <iostream>
 #include <fstream>
+#include <conio.h>
 
 using namespace std;
 
@@ -13,6 +14,9 @@ int main()
 
 	gen_known_matrix(data);
 	print_matrix("someting.csv", data, 5);
+
+	printf("matrix complete");
+	_getch();
     return 0;
 }
 
