@@ -1,6 +1,3 @@
-// floyd_known.cpp : Defines the entry point for the console application.
-//
-
 #include "stdafx.h"
 #include <iostream>
 #include <fstream>
@@ -9,8 +6,6 @@ using namespace std;
 
 void gen_known_matrix(int *data);
 void print_matrix(std::string fileName, int *data, int size);
-
-
 
 int main()
 {
@@ -26,10 +21,8 @@ void gen_known_matrix(int *data)
 	int i, j;
 	int size = 5;
 
-	for (i = 0; i < size; i++)
-	{
-		for (j = 0; j < size; j++)
-		{
+	for (i = 0; i < size; i++)	{
+		for (j = 0; j < size; j++)	{
 			data[i*size + j] = INT_MAX;
 		}
 	}
