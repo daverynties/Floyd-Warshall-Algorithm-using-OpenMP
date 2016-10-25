@@ -2,61 +2,91 @@
 #include <iostream>
 #include <fstream>
 #include <conio.h>
+#include <cstdlib>
+#include <climits>
+#include <ctime>
+using namespace std;
 
 using namespace std;
 
+clock_t start_par, finish_par, start_seq, finish_seq;
 void gen_known_matrix(int *data);
 void print_matrix(std::string fileName, int *data, int size);
 
+#define MAX_WEIGHT 20
+
+void gen_adj_matrix(int *, int);
+void print_matrix(int*, int);
+void floyds_algo(int*, int);
+
 int main()
 {
-	int *data = new int[5 * 5];
+	
+	int numVertices = 1000;
+	int avgConnectivity = 1000;
 
-	gen_known_matrix(data);
-	print_matrix("someting.csv", data, 5);
+	int *adjMatrix = new int[numVertices * numVertices];
 
-	printf("matrix complete");
+	start_seq = clock();
+	//generate random graph/matrix
+	gen_adj_matrix(adjMatrix, numVertices);
+	finish_seq = clock();
+	//print matrix
+	print_matrix(adjMatrix, numVertices);
+	//compute
+	start_par = clock();
+	floyds_algo(adjMatrix, numVertices);
+	//print matrix
+	finish_par = clock();
+	print_matrix(adjMatrix, numVertices);
+	
+
+	int time_par = (finish_par - start_par);
+	int time_seq = (finish_seq - start_seq);
+
+	//gen_adj_matrix(data);
+	//print_matrix("matrix.out", data, 5);
+
+	printf("matrix complete\n\n");
+	printf("Time Parallel: %d\n", (time_par));
+	printf("Time Seq: %d", (time_seq));
 	_getch();
     return 0;
 }
 
-void gen_known_matrix(int *data)
-{
-	int i, j;
-	int size = 5;
+void floyds_algo(int *data, int size) {
+	int i, j, k;
 
-	for (i = 0; i < size; i++) {
-		for (j = 0; j < size; j++) {
-			data[i*size + j] = INT_MAX;
-		}
-	}
 
-	data[0 * size + 1] = 18;
-	data[0 * size + 2] = 14;
-	data[0 * size + 3] = 7;
-	data[1 * size + 4] = 20;
-	data[2 * size + 1] = 1;
-	data[2 * size + 4] = 12;
-	data[3 * size + 4] = 3;
-	data[4 * size + 2] = 10;
+	for (k = 0; k < size; k++)
+#pragma omp parallel for
+		for (i = 0; i < size; i++)
+			for (j = 0; j < size; j++)
+				if ((data[i*size + k] + data[k*size + j]) < data[i*size + j])
+					data[i*size + j] = data[i*size + k] + data[k*size + j];
 }
 
-void print_matrix(std::string fileName, int *data, int size)
+void gen_adj_matrix(int *data, int size)
+{
+	int i, j;
+
+	for (i = 0; i < size; i++)
+		for (j = 0; j < size; j++)
+			data[i*size + j] = 1 + (rand() % size); 
+}
+
+
+void print_matrix(int *data, int size)
 {
 	int i, j;
 	ofstream outputFile;
 
-	outputFile.open(fileName);
+	outputFile.open("matrix.out");
 	for (i = 0; i < size; i++) {
-		for (j = 0; j < size; j++) {
-			if (data[i*size + j] != INT_MAX) {
-				outputFile << data[i*size + j];
-			}
-			if ((j + 1) != size) {
-				outputFile << ",";
-			}
-		}
-		outputFile << endl;
+		for (j = 0; j < size; j++)
+			outputFile << data[i*size + j] << "\t";
+		//outputFile << "\n";
 	}
+
 	outputFile.close();
 }
